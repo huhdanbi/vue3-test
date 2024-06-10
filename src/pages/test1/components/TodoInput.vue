@@ -1,10 +1,7 @@
 <script setup>
-    // import { useTodo } from '@/composables/todo'
-    import { ref, defineEmits } from 'vue'
+    import { ref } from 'vue'
     import BtnDefault from '@/components/common/BtnDefault.vue'
 
-    // const { todo, todoList } = useTodo()
-    
     const todo = ref('')
 
     const emit = defineEmits(['addList'])

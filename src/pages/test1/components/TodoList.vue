@@ -1,5 +1,5 @@
 <script setup>
-    import { defineProps, defineEmits, inject } from 'vue'
+    import { reactive, inject } from 'vue'
     import BtnDefault from '@/components/common/BtnDefault.vue'
 
     const emit = defineEmits(['onUpdate', 'onDelete'])
@@ -12,7 +12,26 @@
         }
     })
 
+    let updateData = reactive({})
+
+    const onInput = (msg, idx) => {
+        updateData = {msg, idx}
+    }
+
+    const onCancel = (idx) => {
+        emit('onCancel', idx)
+    }
+
+    const onConfirm = () => {
+        if( updateData.msg.length < 1 ){
+            swal('check input')
+            return false
+        }
+        emit('onConfirm', updateData)
+    }
+
     const onUpdate = (idx) => {
+        onInput('', idx)
         emit('onUpdate', idx)
     }
 
@@ -38,12 +57,26 @@
             <v-list-item
                 v-for="(item, i) in todoList"
                 :key="i"
-                :title="item.msg"
                 class="list-todo"
             >
+                <div v-if="!item.isUpdate">
+                    {{ item.msg }}
+                </div>
+
+                <div v-else>
+                    <input @input="(e) => onInput(e.target.value, i)" type="text" class="inp-default">
+                </div>
+                
                 <template v-slot:append>
-                    <btn-default class="btn-update" name="update" icon="fa-pen-to-square" @click="onUpdate(i)" />
-                    <btn-default class="btn-remove" name="delete" icon="fa-trash" @click="onDelete(i)"/>
+                    <div v-if="!item.isUpdate">
+                        <btn-default class="btn-update" name="update" icon="fa-pen-to-square" @click="onUpdate(i)" :disabled="item.isDisabled" />
+                        <btn-default class="btn-remove" name="delete" icon="fa-trash" @click="onDelete(i)"/>    
+                    </div>
+
+                    <div v-else>
+                        <btn-default class="btn-update" name="confirm" icon="fa-solid fa-check" @click="onConfirm(i)"/>    
+                        <btn-default class="btn-remove" name="cancel" icon="fa-solid fa-xmark" @click="onCancel(i)"/>    
+                    </div>
                 </template>
 
             </v-list-item>
@@ -57,5 +90,6 @@
 .wrap-list{margin:0 50px}
 .list-todo{border-top:1px solid #dedede}
 
+.inp-default{border:1px solid #dedede}
 </style>
 
